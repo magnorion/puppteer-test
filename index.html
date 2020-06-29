@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="canvas"></div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        var $ = jQuery;
+        var player = document.createElement('video');
+
+        var url = 'https://unified.adsafeprotected.com/v2/442800/45632444?mon=45632445&omidPartner=[omidPartner]&apiframeworks=[APIFRAMEWORKS]&bundleId=[bundleId]&originalVast=https://thefmedia.com/vast/272954537.xml';
+
+        $.ajax({
+            url: url,
+            method: 'GET'
+        }).done(function (res) {
+            var creatives = res.getElementsByTagName('Ad')[0].getElementsByTagName('Creatives')[0];
+            var linear = creatives.getElementsByTagName('Creative')[0].getElementsByTagName('Linear')[0]
+            var videos = linear.getElementsByTagName('MediaFiles')[0].getElementsByTagName('MediaFile');
+            var pixels = linear.getElementsByTagName('TrackingEvents')[0].getElementsByTagName('Tracking');
+
+            var inline = res.getElementsByTagName('Ad')[0].getElementsByTagName('InLine');
+
+            var video = [];
+            for (var i = 0; i < videos.length; i++) {
+                if (videos[i].getAttribute('type') == 'video/mp4') {
+                    video.push(videos[i].innerHTML);
+                }
+            }
+
+            // selecao random
+            var random = Math.floor(Math.random() * (video.length - 0) + 0);
+
+            // url do video
+            var videoUrl = changeUrl(video[random]);
+
+            // configuracao do video
+            player.src = videoUrl;
+            player.autoplay = true;
+            player.muted = true;
+
+            // cria o video
+            document.querySelector('#canvas').appendChild(player);
+
+            var initialPixels = inline[0].getElementsByTagName('Impression');
+            for (var i = 0; i < initialPixels.length; i++) {
+                createPixel(initialPixels[i].innerHTML);
+            }
+
+            // aplica o pixel
+            setTimeout(function () {
+                createPixel(pixels[0].innerHTML);
+                createPixel(pixels[1].innerHTML);
+                createPixel(pixels[2].innerHTML);
+                createPixel(pixels[3].innerHTML);
+                createPixel(pixels[4].innerHTML);
+            }, 1000)
+        });
+
+        function changeUrl(url) {
+            return url.replace("<![CDATA[", "").replace("]]>", "");
+        }
+
+        function createPixel(url) {
+            var img = document.createElement('img');
+            img.src = changeUrl(url);
+            document.querySelector('body').appendChild(img);
+        }
+    </script>
+</body>
+
+</html>
